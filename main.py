@@ -148,7 +148,8 @@ def health():
 
 
 # ==========================================================
-# SERVIÇO: DEFESAS (Camada 2: "Defesas") vai criar as routas para a defense, e posteriomente é necessário alterar após ser feita a camada.
+# SERVIÇO: DEFESAS (Camada 2: "Defesas") vai criar as routas para a defense, e posteriomente é necessário alterar após ser feita a camada 2, 
+#vai ser feito em todas as varieaveis.
 # CRUD (5) + stats (1) = 6
 # ==========================================================
 @app.get("/defenses", response_model=List[DefenseOut], tags=["Defesas"])
