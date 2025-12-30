@@ -20,9 +20,19 @@
 #def threats():      # ✅ nome decidido por ti
  #  return {"status": "ok"}
 
-from fastapi import FastAPI, HTTPException, Query, status #cria a app/http e permite que sejam enviados os erros
+from fastapi import FastAPI, HTTPException, Query, status, Depends #cria a app/http e permite que sejam enviados os erros
 from pydantic import BaseModel, Field #metodo de criação de modelos de validação
 from typing import Optional, List, Dict, Any  # o campo valor pode ser opcional ou uma lista
+from sqlalchemy.orm import Session
+from database import get_db, engine, Base
+import models
+import services
+from schemas import (
+    AttackTypeIn, AttackTypeOut,
+    DefenseIn, DefenseOut,
+    VulnerabilityIn, VulnerabilityOut,
+    IncidentIn, IncidentOut
+)
 
 # ==========================================================
 # CAMADA 1 (APRESENTAÇÃO)
@@ -34,8 +44,11 @@ from typing import Optional, List, Dict, Any  # o campo valor pode ser opcional 
 app = FastAPI(
     title="Cybersecurity Threats API",
     version="1.0.0",
-    description="Camada 1: Rotas REST + validação + OpenAPI3"
+    description="API REST com 4 camadas: Apresentação, Negócios, Persistência e Base de Dados"
 )
+
+# Criar tabelas no banco de dados ao iniciar a aplicação
+Base.metadata.create_all(bind=engine)
 
 #Criação dos dicionários
 
@@ -153,40 +166,43 @@ def health():
 # CRUD (5) + stats (1) = 6
 # ==========================================================
 @app.get("/defenses", response_model=List[DefenseOut], tags=["Defesas"])
-def list_defenses():
-    # TODO (Camada 2): return services.list_defenses()
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def list_defenses(db: Session = Depends(get_db)):
+    return services.list_defense_mechanisms(db)
 
 @app.get("/defenses/{defense_id}", response_model=DefenseOut, tags=["Defesas"])
-def get_defense(defense_id: int):
+def get_defense(defense_id: int, db: Session = Depends(get_db)):
     if defense_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid defense id")
-    # TODO (Camada 2): return services.get_defense(defense_id)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    defense = services.get_defense_mechanism(db, defense_id)
+    if not defense:
+        raise HTTPException(status_code=404, detail="Defense not found")
+    return defense
 
 @app.post("/defenses", response_model=DefenseOut, status_code=status.HTTP_201_CREATED, tags=["Defesas"])
-def create_defense(payload: DefenseIn):
-    # TODO (Camada 2): return services.create_defense(payload)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def create_defense(payload: DefenseIn, db: Session = Depends(get_db)):
+    return services.create_defense_mechanism(db, payload)
 
 @app.put("/defenses/{defense_id}", response_model=DefenseOut, tags=["Defesas"])
-def update_defense(defense_id: int, payload: DefenseIn):
+def update_defense(defense_id: int, payload: DefenseIn, db: Session = Depends(get_db)):
     if defense_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid defense id")
-    # TODO (Camada 2): return services.update_defense(defense_id, payload)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    defense = services.update_defense_mechanism(db, defense_id, payload)
+    if not defense:
+        raise HTTPException(status_code=404, detail="Defense not found")
+    return defense
 
 @app.delete("/defenses/{defense_id}", tags=["Defesas"])
-def delete_defense(defense_id: int):
+def delete_defense(defense_id: int, db: Session = Depends(get_db)):
     if defense_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid defense id")
-    # TODO (Camada 2): services.delete_defense(defense_id)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    deleted = services.delete_defense_mechanism(db, defense_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Defense not found")
+    return {"detail": "Defense deleted successfully"}
 
-@app.get("/defenses/stats", tags=["Defesas"])
-def defenses_stats():
-    # TODO (Camada 2): return services.defenses_stats()
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+@app.get("/defenses/stats/all", tags=["Defesas"])
+def defenses_stats(db: Session = Depends(get_db)):
+    return services.defense_mechanisms_stats(db)
 
 
 # ==========================================================
@@ -194,40 +210,43 @@ def defenses_stats():
 # CRUD (5) + stats (1) = 6
 # ==========================================================
 @app.get("/attacks", response_model=List[AttackTypeOut], tags=["Ataques"])
-def list_attacks():
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def list_attacks(db: Session = Depends(get_db)):
+    return services.list_attack_types(db)
 
 @app.get("/attacks/{attack_id}", response_model=AttackTypeOut, tags=["Ataques"])
-def get_attack(attack_id: int):
+def get_attack(attack_id: int, db: Session = Depends(get_db)):
     if attack_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid attack id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    attack = services.get_attack_type(db, attack_id)
+    if not attack:
+        raise HTTPException(status_code=404, detail="Attack not found")
+    return attack
 
 @app.post("/attacks", response_model=AttackTypeOut, status_code=status.HTTP_201_CREATED, tags=["Ataques"])
-def create_attack(payload: AttackTypeIn):
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def create_attack(payload: AttackTypeIn, db: Session = Depends(get_db)):
+    return services.create_attack_type(db, payload)
 
 @app.put("/attacks/{attack_id}", response_model=AttackTypeOut, tags=["Ataques"])
-def update_attack(attack_id: int, payload: AttackTypeIn):
+def update_attack(attack_id: int, payload: AttackTypeIn, db: Session = Depends(get_db)):
     if attack_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid attack id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    attack = services.update_attack_type(db, attack_id, payload)
+    if not attack:
+        raise HTTPException(status_code=404, detail="Attack not found")
+    return attack
 
 @app.delete("/attacks/{attack_id}", tags=["Ataques"])
-def delete_attack(attack_id: int):
+def delete_attack(attack_id: int, db: Session = Depends(get_db)):
     if attack_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid attack id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    deleted = services.delete_attack_type(db, attack_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Attack not found")
+    return {"detail": "Attack deleted successfully"}
 
-@app.get("/attacks/stats", tags=["Ataques"])
-def attacks_stats():
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+@app.get("/attacks/stats/all", tags=["Ataques"])
+def attacks_stats(db: Session = Depends(get_db)):
+    return services.attack_types_stats(db)
 
 
 # ==========================================================
@@ -235,40 +254,43 @@ def attacks_stats():
 # CRUD (5) + stats (1) = 6
 # ==========================================================
 @app.get("/vulnerabilities", response_model=List[VulnerabilityOut], tags=["Vulnerabilidades"])
-def list_vulnerabilities():
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def list_vulnerabilities(db: Session = Depends(get_db)):
+    return services.list_vulnerabilities(db)
 
 @app.get("/vulnerabilities/{vuln_id}", response_model=VulnerabilityOut, tags=["Vulnerabilidades"])
-def get_vulnerability(vuln_id: int):
+def get_vulnerability(vuln_id: int, db: Session = Depends(get_db)):
     if vuln_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid vulnerability id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    vuln = services.get_vulnerability(db, vuln_id)
+    if not vuln:
+        raise HTTPException(status_code=404, detail="Vulnerability not found")
+    return vuln
 
 @app.post("/vulnerabilities", response_model=VulnerabilityOut, status_code=status.HTTP_201_CREATED, tags=["Vulnerabilidades"])
-def create_vulnerability(payload: VulnerabilityIn):
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def create_vulnerability(payload: VulnerabilityIn, db: Session = Depends(get_db)):
+    return services.create_vulnerability(db, payload)
 
 @app.put("/vulnerabilities/{vuln_id}", response_model=VulnerabilityOut, tags=["Vulnerabilidades"])
-def update_vulnerability(vuln_id: int, payload: VulnerabilityIn):
+def update_vulnerability(vuln_id: int, payload: VulnerabilityIn, db: Session = Depends(get_db)):
     if vuln_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid vulnerability id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    vuln = services.update_vulnerability(db, vuln_id, payload)
+    if not vuln:
+        raise HTTPException(status_code=404, detail="Vulnerability not found")
+    return vuln
 
 @app.delete("/vulnerabilities/{vuln_id}", tags=["Vulnerabilidades"])
-def delete_vulnerability(vuln_id: int):
+def delete_vulnerability(vuln_id: int, db: Session = Depends(get_db)):
     if vuln_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid vulnerability id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    deleted = services.delete_vulnerability(db, vuln_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Vulnerability not found")
+    return {"detail": "Vulnerability deleted successfully"}
 
-@app.get("/vulnerabilities/stats", tags=["Vulnerabilidades"])
-def vulnerabilities_stats():
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+@app.get("/vulnerabilities/stats/all", tags=["Vulnerabilidades"])
+def vulnerabilities_stats(db: Session = Depends(get_db)):
+    return services.vulnerabilities_stats(db)
 
 
 # ==========================================================
@@ -278,38 +300,42 @@ def vulnerabilities_stats():
 @app.get("/incidents", response_model=List[IncidentOut], tags=["Incidentes"])
 def list_incidents(
     year: Optional[int] = Query(None, description="Filtrar por ano"),
-    country: Optional[str] = Query(None, description="Filtrar por país")
+    country: Optional[str] = Query(None, description="Filtrar por país"),
+    db: Session = Depends(get_db)
 ):
-    # TODO (Camada 2): return services.list_incidents(year, country)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    return services.list_incidents(db, year, country)
 
 @app.get("/incidents/{incident_id}", response_model=IncidentOut, tags=["Incidentes"])
-def get_incident(incident_id: int):
+def get_incident(incident_id: int, db: Session = Depends(get_db)):
     if incident_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid incident id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    incident = services.get_incident(db, incident_id)
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return incident
 
 @app.post("/incidents", response_model=IncidentOut, status_code=status.HTTP_201_CREATED, tags=["Incidentes"])
-def create_incident(payload: IncidentIn):
-    # TODO (Camada 2): validar FKs + inserir
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+def create_incident(payload: IncidentIn, db: Session = Depends(get_db)):
+    return services.create_incident(db, payload)
 
 @app.put("/incidents/{incident_id}", response_model=IncidentOut, tags=["Incidentes"])
-def update_incident(incident_id: int, payload: IncidentIn):
+def update_incident(incident_id: int, payload: IncidentIn, db: Session = Depends(get_db)):
     if incident_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid incident id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    incident = services.update_incident(db, incident_id, payload)
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return incident
 
 @app.delete("/incidents/{incident_id}", tags=["Incidentes"])
-def delete_incident(incident_id: int):
+def delete_incident(incident_id: int, db: Session = Depends(get_db)):
     if incident_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid incident id")
-    # TODO (Camada 2)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+    deleted = services.delete_incident(db, incident_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return {"detail": "Incident deleted successfully"}
 
-@app.get("/incidents/stats", tags=["Incidentes"])
-def incidents_stats():
-    # TODO (Camada 2): estatísticas (ex.: perdas totais, por ano, por tipo)
-    raise HTTPException(status_code=501, detail="Implementar na Camada 2")
+@app.get("/incidents/stats/all", tags=["Incidentes"])
+def incidents_stats(db: Session = Depends(get_db)):
+    return services.incidents_stats(db)
