@@ -63,17 +63,17 @@ class GlobalCyberThreat(Base):
     """Modelo para tabela global_cyber_threats"""
     __tablename__ = "global_cyber_threats"
     
-    id = Column(Integer, primary_key=True, index=True)
-    country = Column(String(50), nullable=True)
-    year = Column(Integer, nullable=True)
-    attack_type = Column(Integer, ForeignKey("attack_types.id"), nullable=True)
-    target_industry = Column(Integer, ForeignKey("target_industries.id"), nullable=True)
-    financial_loss_million = Column(Numeric(10, 2), nullable=True)
-    affected_users = Column(Integer, nullable=True)
-    attack_source = Column(Integer, ForeignKey("attack_sources.id"), nullable=True)
-    security_vulnerability_type = Column(Integer, ForeignKey("security_vulnerabilities.id"), nullable=True)
-    defense_mechanism_used = Column(Integer, ForeignKey("defense_mechanisms.id"), nullable=True)
-    incident_resolution_time_hours = Column(Integer, nullable=True)
+    id = Column('Id', Integer, primary_key=True, index=True)
+    country = Column('Country', String(50), nullable=True)
+    year = Column('Year', Integer, nullable=True)
+    attack_type = Column('Attack Type', Integer, ForeignKey('attack_types.id'), nullable=True)
+    target_industry = Column('Target Industry', Integer, ForeignKey('target_industries.id'), nullable=True)
+    financial_loss_million = Column('Financial Loss (in Million $)', Numeric(10, 2), nullable=True)
+    affected_users = Column('Number of Affected Users', Integer, nullable=True)
+    attack_source = Column('Attack Source', Integer, ForeignKey('attack_sources.id'), nullable=True)
+    security_vulnerability_type = Column('Security Vulnerability Type', Integer, ForeignKey('security_vulnerabilities.id'), nullable=True)
+    defense_mechanism_used = Column('Defense Mechanism Used', Integer, ForeignKey('defense_mechanisms.id'), nullable=True)
+    incident_resolution_time_hours = Column('Incident Resolution Time (in Hours)', Integer, nullable=True)
     
     def __repr__(self):
         return f"<GlobalCyberThreat(id={self.id}, country={self.country}, year={self.year})>"
