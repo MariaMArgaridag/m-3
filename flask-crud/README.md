@@ -73,6 +73,10 @@ Com o ambiente virtual ativado, execute:
 
 ```bash
 python app/main.py
+
+ou
+
+python -m app.main
 ```
 
 A API ficará disponível em:
