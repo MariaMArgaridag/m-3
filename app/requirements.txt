@@ -1,0 +1,64 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DEPENDÊNCIAS DA API CYBERSECURITY FLASK
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ┌─────────────────────────────────────────────────────┐
+# │ CAMADA 1: FRAMEWORK WEB                             │
+# │ (Cria o servidor HTTP que recebe requisições)      │
+# └─────────────────────────────────────────────────────┘
+
+Flask==3.1.2                      # Framework web Python - Cria servidor
+Werkzeug==3.1.4                   # Utilitários web avançados do Flask
+click==8.3.1                      # Interface CLI (linha de comando)
+itsdangerous==2.2.0               # Gera tokens seguros (cookies, sessões)
+Jinja2==3.1.6                     # Motor de templates HTML (renderizar páginas)
+MarkupSafe==3.0.3                 # Segurança HTML - previne injeção de código
+blinker==1.9.0                    # Sistema de eventos/sinais do Flask
+
+# ┌─────────────────────────────────────────────────────┐
+# │ CAMADA 2: DOCUMENTAÇÃO & SWAGGER                    │
+# │ (Gera documentação automática interativa)          │
+# └─────────────────────────────────────────────────────┘
+
+flasgger==0.9.7.1                 # Gera documentação automática (Swagger UI)
+PyYAML==6.0.2                     # Parser de arquivos YAML (especificação OpenAPI)
+jsonschema>=3.0.1                 # Valida estrutura de dados JSON
+jsonschema-specifications>=2023.03.6  # Especificações padrão para validação JSON
+referencing>=0.28.4               # Gerencia referências entre schemas JSON
+rpds-py>=0.7.1                    # Otimização de performance em validações
+marshmallow==3.23.1               # Serializa/deserializa objetos Python ↔ JSON
+mistune>=0.8.0                    # Parser Markdown (renderizar documentação)
+
+# ┌─────────────────────────────────────────────────────┐
+# │ CAMADA 3: BANCO DE DADOS                            │
+# │ (Comunica com MySQL para armazenar dados)          │
+# └─────────────────────────────────────────────────────┘
+
+mysql-connector-python==9.5.0     # Driver MySQL - Conecta Python com banco de dados
+
+# ┌─────────────────────────────────────────────────────┐
+# │ CAMADA 4: VARIÁVEIS DE AMBIENTE & TESTES           │
+# │ (Suporte e ferramentas auxiliares)                  │
+# └─────────────────────────────────────────────────────┘
+
+python-dotenv==1.2.1              # Lê arquivo .env (senhas seguras)
+requests>=2.31.0                  # Cliente HTTP - Para testar a API
+attrs>=22.2.0                     # Simplifica classes Python com decoradores
+packaging>=21.0                   # Utilitários de versionamento de pacotes
+six>=1.10.0                       # Compatibilidade entre Python 2 e 3
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TOTAL: 21 PACOTES PRINCIPAIS
+# + ~40 dependências indiretas (instaladas automaticamente)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# INSTALAÇÃO:
+# pip install -r requirements.txt
+
+# VERIFICAÇÃO:
+# pip list (lista todos os pacotes instalados)
+# pip show <nome-pacote> (mostra detalhes de um pacote)
+
+
+
+
